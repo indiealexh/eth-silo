@@ -246,8 +246,6 @@ otherwise you will get errors on start because of JSON comments.**
     "poolFee": 1.0,
     // Pool fees beneficiary address (leave it blank to disable fee withdrawals)
     "poolFeeAddress": "",
-    // Donate 10% from pool fees to developers
-    "donate": true,
     // Unlock only if this number of blocks mined back
     "depth": 120,
     // Simply don't touch this option
@@ -259,7 +257,9 @@ otherwise you will get errors on start because of JSON comments.**
     // Geth instance node rpc endpoint for unlocking blocks
     "daemon": "http://127.0.0.1:8545",
     // Rise error if can't reach geth in this amount of time
-    "timeout": "10s"
+    "timeout": "10s",
+    // set block reward level for eth base alt coins
+    "reward": "5000000000000000000"
   },
 
   // Pay out miners using this module
@@ -311,12 +311,5 @@ This pool is tested to work with [Ethcore's Parity](https://github.com/ethcore/p
 
 ### Credits
 
-Made by sammy007. Licensed under GPLv3.
+Original by sammy007. Customised by indiealexh. Licensed under GPLv3.
 
-#### Contributors
-
-[Alex Leverington](https://github.com/subtly)
-
-### Donations
-
-ETH/ETC: 0xb85150eb365e7df0941f0cf08235f987ba91506a

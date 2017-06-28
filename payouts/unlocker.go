@@ -19,23 +19,19 @@ type UnlockerConfig struct {
 	Enabled        bool    `json:"enabled"`
 	PoolFee        float64 `json:"poolFee"`
 	PoolFeeAddress string  `json:"poolFeeAddress"`
-	Donate         bool    `json:"donate"`
 	Depth          int64   `json:"depth"`
 	ImmatureDepth  int64   `json:"immatureDepth"`
 	KeepTxFees     bool    `json:"keepTxFees"`
 	Interval       string  `json:"interval"`
 	Daemon         string  `json:"daemon"`
 	Timeout        string  `json:"timeout"`
+	Reward         string   `json:"reward"`
 }
 
 const minDepth = 16
 
 var constReward = math.MustParseBig256("5000000000000000000")
 var uncleReward = new(big.Int).Div(constReward, new(big.Int).SetInt64(32))
-
-// Donate 10% from pool fees to developers
-const donationFee = 10.0
-const donationAccount = "0xb85150eb365e7df0941f0cf08235f987ba91506a"
 
 type BlockUnlocker struct {
 	config   *UnlockerConfig
@@ -48,6 +44,11 @@ type BlockUnlocker struct {
 func NewBlockUnlocker(cfg *UnlockerConfig, backend *storage.RedisClient) *BlockUnlocker {
 	if len(cfg.PoolFeeAddress) != 0 && !util.IsValidHexAddress(cfg.PoolFeeAddress) {
 		log.Fatalln("Invalid poolFeeAddress", cfg.PoolFeeAddress)
+	}
+	if len(cfg.Reward) !=0 {
+		constReward = math.MustParseBig256(cfg.Reward)
+		uncleReward = new(big.Int).Div(constReward, new(big.Int).SetInt64(32))
+		log.Printf("Set reward value to %v", constReward)
 	}
 	if cfg.Depth < minDepth*2 {
 		log.Fatalf("Block maturity depth can't be < %v, your depth is %v", minDepth*2, cfg.Depth)
@@ -454,13 +455,6 @@ func (u *BlockUnlocker) calculateRewards(block *storage.BlockData) (*big.Rat, *b
 		extraReward := new(big.Rat).SetInt(block.ExtraReward)
 		poolProfit.Add(poolProfit, extraReward)
 		revenue.Add(revenue, extraReward)
-	}
-
-	if u.config.Donate {
-		var donation = new(big.Rat)
-		poolProfit, donation = chargeFee(poolProfit, donationFee)
-		login := strings.ToLower(donationAccount)
-		rewards[login] += weiToShannonInt64(donation)
 	}
 
 	if len(u.config.PoolFeeAddress) != 0 {
