@@ -84,7 +84,7 @@
 		"enabled": false,
 		"poolFee": 1.0,
 		"poolFeeAddress": "",
-		"donate": true,
+		"reward": "5000000000000000000",
 		"depth": 120,
 		"immatureDepth": 20,
 		"keepTxFees": false,
